@@ -1,3 +1,4 @@
+import os
 from django.db import models
 import qrcode
 
@@ -12,7 +13,7 @@ class Article(models.Model):
 
 class Goods(models.Model):
     sr_no = models.IntegerField()
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="goods_article")
     quantity = models.IntegerField()
     color = models.CharField(max_length = 20, choices = article_colors)
     other = models.TextField()
@@ -21,7 +22,11 @@ class Goods(models.Model):
         return f"{self.sr_no}-{self.article.name}"
 
     def get_qr(self):
-        return qrcode.make(f"{self.article.name}-{self.article.unit}-{self.color}-{self.quantity}")
+        qr_image = qrcode.make(f"{self.article.name}-{self.article.unit}-{self.color}-{self.quantity}")
+        qr_image.save(f'{self}.png')
+        # with open(f'{self}.png', 'w') as image_file:
+        #     image_file.write(qr_image)
+        return "file://" + os.path.abspath(f'{self}.png')
 
 class Supplier(models.Model):
     name =  models.CharField(max_length = 100)
@@ -34,8 +39,8 @@ class Supplier(models.Model):
 
 class GR(models.Model):
     date = models.DateField(auto_now_add=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    goods = models.ForeignKey(Goods, on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="gr_supplier")
+    goods = models.ManyToManyField(Goods, related_name="gr_goods")
 
     def __str__(self):
         return f"{self.date}-{self.supplier.name}"
