@@ -130,3 +130,9 @@ dmypy.json
 
 # vscode
 .vscode
+
+# mac files
+**/*.DS_Store
+
+# png files from qr codes
+**/*.png
