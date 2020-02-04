@@ -1,6 +1,7 @@
 import os
 from django.db import models
 import qrcode
+import datetime
 
 from .constants import *
 
@@ -36,10 +37,22 @@ class Supplier(models.Model):
         return f"{self.name}-{self.gst_no}"
 
 class GR(models.Model):
+    gr_id = models.CharField(max_length = 10, unique=True)
     date = models.DateField(auto_now_add=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="gr_supplier")
     goods = models.ManyToManyField(Goods, related_name="gr_goods")
 
     def __str__(self):
         return f"{self.date}-{self.supplier.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = datetime.datetime.today()
+            year = today.year
+            if datetime.datetime.now().month <= 3:
+                year -= 1
+            current_year_start_date = datetime.date(year, 4, 1)
+            running_serial = GR.objects.filter(date__gte = current_year_start_date).count() + 1
+            self.gr_id = f"{year%100}{(year+1)%100}/{running_serial}"
+        super(GR, self).save(*args, **kwargs)
 

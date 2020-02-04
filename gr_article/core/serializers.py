@@ -12,7 +12,7 @@ class GoodsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goods
         fields = '__all__'
-        read_only_fields = ("sr_no", "qr_code")
+        read_only_fields = ('sr_no', 'qr_code')
 
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,6 +24,7 @@ class GRSerializer(serializers.ModelSerializer):
     class Meta:
         model = GR
         fields = '__all__'
+        read_only_fields = ('gr_id',)
         
 
     def create(self, validated_data):
@@ -31,7 +32,7 @@ class GRSerializer(serializers.ModelSerializer):
         instance = super(GRSerializer, self).create(validated_data)
         sr_index = 1
         for entry in goods:
-            entry["sr_no"] = sr_index
+            entry['sr_no'] = sr_index
             sr_index += 1
             saved_entry = Goods.objects.create(**entry)
             instance.goods.add(saved_entry.id)
