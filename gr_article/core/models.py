@@ -24,8 +24,6 @@ class Goods(models.Model):
     def get_qr(self):
         qr_image = qrcode.make(f"{self.article.name}-{self.article.unit}-{self.color}-{self.quantity}")
         qr_image.save(f'{self}.png')
-        # with open(f'{self}.png', 'w') as image_file:
-        #     image_file.write(qr_image)
         return "file://" + os.path.abspath(f'{self}.png')
 
 class Supplier(models.Model):
